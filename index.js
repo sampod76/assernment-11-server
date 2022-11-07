@@ -18,15 +18,34 @@ const test = async (req, res) => {
     try {
         await client.connect()
         console.log('Database connect');
-      
-       
-
     } catch (error) {
         console.log(error.message)
     }
-
 }
 test()
+
+//get all delivery data
+
+app.get('/delivery', async (req, res) => {
+    try {
+        const result = await serviceCollaction.find({}).toArray()
+
+        res.send({
+            success: true,
+            message: 'successfuly Get Data',
+            data: result
+        })
+
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+
+})
+
 
 app.get('/', (req, res) => {
     res.send('this is home service')
