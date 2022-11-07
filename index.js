@@ -47,6 +47,41 @@ app.get('/delivery', async (req, res) => {
 })
 
 
+// input / add delivery service 
+
+app.post('/delivery' , async(req,res)=>{
+    const data = req.body
+   
+
+    try {
+        const result = await serviceCollaction.insertOne(data)
+        // console.log(result)
+
+        if(result.insertedId){
+            res.send({
+                success:true,
+                message:'Successfully Data Input'
+            })
+        }
+        else{
+            res.send({
+                success:false,
+                message:`Do not input Data`
+            })
+        }
+        console.log(result);
+            
+        
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+})
+
+
 app.get('/', (req, res) => {
     res.send('this is home service')
 })
