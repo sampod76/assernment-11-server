@@ -118,6 +118,35 @@ app.post('/reviews' , async(req,res)=>{
 })
 
 
+
+// reviews to delete this id
+app.delete('/reviews/:id' ,async(req ,res)=>{
+    const quaryid = req.params.id
+    try {
+         const result = await reviewCollaction.deleteOne({_id : ObjectId(quaryid)})
+        if(result.deletedCount === 1){
+
+            res.send({
+                success:true,
+                message:`Successfully delete ${quaryid}`
+            })
+        }
+        else{
+            res.send({
+                success:false,
+                message:`Do not delete this id ${quaryid}`
+            })
+        }
+        
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+})
+
 app.get('/', (req, res) => {
     res.send('this is home service')
 })
