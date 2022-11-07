@@ -82,6 +82,42 @@ app.post('/delivery' , async(req,res)=>{
 })
 
 
+
+// Add customer reviews 
+
+app.post('/reviews' , async(req,res)=>{
+    const data = req.body
+    // console.log(data)
+    // const data = {email : 'sampodnath'}
+
+    try {
+        const result = await reviewCollaction.insertOne(data)
+
+        if(result.insertedId){
+            res.send({
+                success:true,
+                message:'Successfully Data Input'
+            })
+        }
+        else{
+            res.send({
+                success:false,
+                message:`Do not input Data`
+            })
+        }
+        console.log(result);
+            
+        
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+})
+
+
 app.get('/', (req, res) => {
     res.send('this is home service')
 })
