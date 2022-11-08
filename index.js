@@ -61,16 +61,16 @@ app.get('/delivery', async (req, res) => {
 
 })
 app.get('/delivery/:id', async (req, res) => {
-    const id =req.params.id
+    const id = req.params.id
     try {
-            const result = await serviceCollaction.findOne({_id : ObjectId(id)})
+        const result = await serviceCollaction.findOne({ _id: ObjectId(id) })
 
-            res.send({
-                success: true,
-                message: 'successfuly Get Data',
-                data: result
-            })
-    
+        res.send({
+            success: true,
+            message: 'successfuly Get Data',
+            data: result
+        })
+
 
     } catch (error) {
         res.send({
@@ -155,9 +155,28 @@ app.post('/reviews', async (req, res) => {
     }
 })
 
+app.get('/reviews', async (req, res) => {
+    try {
+        const result = await reviewCollaction.find({}).toArray()
+        console.log(result)
+        res.send({
+            success: true,
+            message: 'successfull gate data',
+            data: result
+        })
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+})
+
 app.delete('/reviews/:id', async (req, res) => {
     const quaryid = req.params.id
     try {
+
         const result = await reviewCollaction.deleteOne({ _id: ObjectId(quaryid) })
         if (result.deletedCount === 1) {
 
@@ -181,6 +200,57 @@ app.delete('/reviews/:id', async (req, res) => {
         })
     }
 })
+
+app.patch('/reviews/:id', async (req, res) => {
+    const {id} = req.params
+    try {
+        const result = await reviewCollaction.updateOne({ _id: ObjectId(id) }, { $set: req.body })
+        console.log(result)
+        if (result.matchedCount) {
+            res.send({
+                success: true,
+                message: `successfully updated`,
+            });
+        } else {
+            res.send({
+                success: false,
+                error: "Couldn't update  the product",
+            });
+        }
+
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+})
+
+app.get('/reviews/:id', async (req, res) => {
+    const id = req.params.id
+    try {
+        const result = await reviewCollaction.findOne({ _id: ObjectId(id) })
+      
+        res.send({
+            success: true,
+            message: 'successfuly Get Data',
+            data: result
+        })
+
+
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+
+})
+
+
+
 
 app.get('/', (req, res) => {
     res.send('this is home service')
