@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000;
@@ -28,6 +29,40 @@ const test = async (req, res) => {
 
 }
 test()
+function jwtVerify(req, res, next) {
+
+    const authorisation = req.headers.authorisation
+    if (!authorisation) {
+        return res.status(401).body({
+            success: false,
+            message: 'unauthorised access 401'
+        })
+    }
+
+    jwt.verify(authorisation, process.env.JWT_TOKEN_KEY, function (error, decord) {
+
+        if (error) {
+            return res.status(403).send({
+                success: false,
+                message: '403 forbidden access'
+            })
+
+        }
+       req.decord=decord
+       next()
+    })
+
+}
+
+
+
+//JWD TOCKEN
+
+app.post('/jwt', (req, res) => {
+    const user = req.body;
+    const token = jwt.sign(user, process.env.JWT_TOKEN_KEY, { expiresIn: '20h' })
+    res.send({ token })
+})
 
 //get all delivery data
 
@@ -87,7 +122,7 @@ app.get('/delivery/:id', async (req, res) => {
 
 // input / add delivery service 
 
-app.post('/delivery', async (req, res) => {
+app.post('/delivery',jwtVerify, async (req, res) => {
     const data = req.body
 
 
@@ -123,7 +158,7 @@ app.post('/delivery', async (req, res) => {
 
 // Add customer reviews 
 
-app.post('/reviews', async (req, res) => {
+app.post('/reviews',jwtVerify, async (req, res) => {
     const data = req.body
     // console.log(data)
     // const data = {email : 'sampodnath'}
@@ -155,7 +190,7 @@ app.post('/reviews', async (req, res) => {
     }
 })
 
-app.get('/reviews', async (req, res) => {
+app.get('/reviews',jwtVerify, async (req, res) => {
     try {
         const result = await reviewCollaction.find({}).toArray()
         console.log(result)
@@ -173,7 +208,7 @@ app.get('/reviews', async (req, res) => {
     }
 })
 
-app.delete('/reviews/:id', async (req, res) => {
+app.delete('/reviews/:id',jwtVerify, async (req, res) => {
     const quaryid = req.params.id
     try {
 
@@ -201,8 +236,8 @@ app.delete('/reviews/:id', async (req, res) => {
     }
 })
 
-app.patch('/reviews/:id', async (req, res) => {
-    const {id} = req.params
+app.patch('/reviews/:id',jwtVerify, async (req, res) => {
+    const { id } = req.params
     try {
         const result = await reviewCollaction.updateOne({ _id: ObjectId(id) }, { $set: req.body })
         console.log(result)
@@ -227,11 +262,11 @@ app.patch('/reviews/:id', async (req, res) => {
     }
 })
 
-app.get('/reviews/:id', async (req, res) => {
+app.get('/reviews/:id',jwtVerify, async (req, res) => {
     const id = req.params.id
     try {
         const result = await reviewCollaction.findOne({ _id: ObjectId(id) })
-      
+
         res.send({
             success: true,
             message: 'successfuly Get Data',
