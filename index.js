@@ -69,7 +69,7 @@ app.post('/jwt', (req, res) => {
 app.get('/delivery', async (req, res) => {
     try {
         if (req?.headers?.pages == 3) {
-            const result = await serviceCollaction.find({}).limit(3).toArray()
+            const result = await serviceCollaction.find({}).sort({_id:-1}).limit(3).toArray()
 
             res.send({
                 success: true,
@@ -122,11 +122,13 @@ app.get('/delivery/:id', async (req, res) => {
 
 // input / add delivery service 
 
-app.post('/delivery',jwtVerify, async (req, res) => {
+app.post('/delivery', async (req, res) => {
     const data = req.body
 
 
     try {
+       
+
         const result = await serviceCollaction.insertOne(data)
         // console.log(result)
 
@@ -158,7 +160,7 @@ app.post('/delivery',jwtVerify, async (req, res) => {
 
 // Add customer reviews 
 
-app.post('/reviews',jwtVerify, async (req, res) => {
+app.post('/reviews', async (req, res) => {
     const data = req.body
     // console.log(data)
     // const data = {email : 'sampodnath'}
@@ -190,9 +192,30 @@ app.post('/reviews',jwtVerify, async (req, res) => {
     }
 })
 
-app.get('/reviews',jwtVerify, async (req, res) => {
+app.get('/reviews/:email', async (req, res) => {
+const email = req.params.email
     try {
-        const result = await reviewCollaction.find({}).toArray()
+        const result = await reviewCollaction.find({email}).sort({time:-1}).toArray()
+        // console.log(result)
+        res.send({
+            success: true,
+            message: 'successfull gate data',
+            data: result
+        })
+    } catch (error) {
+        res.send({
+            success: false,
+            message: error.message,
+
+        })
+    }
+})
+
+app.get('/reviewsId/:id', async (req, res) => {
+const productId = req.params.id
+console.log(productId);
+    try {
+        const result = await reviewCollaction.find({productId}).toArray()
         console.log(result)
         res.send({
             success: true,
@@ -208,7 +231,7 @@ app.get('/reviews',jwtVerify, async (req, res) => {
     }
 })
 
-app.delete('/reviews/:id',jwtVerify, async (req, res) => {
+app.delete('/reviews/:id', async (req, res) => {
     const quaryid = req.params.id
     try {
 
@@ -236,7 +259,7 @@ app.delete('/reviews/:id',jwtVerify, async (req, res) => {
     }
 })
 
-app.patch('/reviews/:id',jwtVerify, async (req, res) => {
+app.patch('/reviews/:id', async (req, res) => {
     const { id } = req.params
     try {
         const result = await reviewCollaction.updateOne({ _id: ObjectId(id) }, { $set: req.body })
@@ -262,7 +285,7 @@ app.patch('/reviews/:id',jwtVerify, async (req, res) => {
     }
 })
 
-app.get('/reviews/:id',jwtVerify, async (req, res) => {
+app.get('/reviews/:id', async (req, res) => {
     const id = req.params.id
     try {
         const result = await reviewCollaction.findOne({ _id: ObjectId(id) })
